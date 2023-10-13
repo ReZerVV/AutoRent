@@ -1,20 +1,19 @@
-using AutoRent.Data;
 using AutoRent.Domain;
 using AutoRent.Services.DTOs;
 using AutoRent.Services.Exceptions;
 using AutoRent.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using AutoRent.Services.Repositories;
 using System.Text.RegularExpressions;
 
 namespace AutoRent.Services;
 
 public class AutoService : IAutoService
 {
-    private readonly AppDataContext _context;
+    private readonly IAutoRepository autoRepository;
 
-    public AutoService(AppDataContext context)
+    public AutoService(IAutoRepository autoRepository)
     {
-        _context = context;
+        this.autoRepository = autoRepository;
     }
 
     public AutoDto Create(AutoCreateDto createData)
@@ -27,25 +26,25 @@ public class AutoService : IAutoService
             throw new ValidationException("One field, some empty, fill in and try again.");
         }
         var auto = createData.ToEntity();
-        _context.Autos.Add(auto);
-        _context.SaveChanges();
+        autoRepository.Create(auto);
+        autoRepository.SaveChanges();
         return AutoDto.FromEntity(auto);
     }
     
     public void Delete(int id)
     {
-        var auto = _context.Autos.FirstOrDefault(auto => auto.Id == id);
+        var auto = autoRepository.GetById(id);
         if (auto == null)
         {
             throw new ValidationException("Auto id not found");
         }
-        _context.Autos.Remove(auto);
-        _context.SaveChanges();
+        autoRepository.Remove(auto);
+        autoRepository.SaveChanges();
     }
 
     public void Update(AutoUpdateDto updateData)
     {
-        var auto = _context.Autos.FirstOrDefault(auto => auto.Id == updateData.Id);
+        var auto = autoRepository.GetById(updateData.Id);
         if (auto == null)
         {
             throw new ValidationException("Auto id not found");
@@ -55,12 +54,12 @@ public class AutoService : IAutoService
         auto.Class = updateData.Class;
         auto.Brand = updateData.Brand;
         auto.CostPerHour = updateData.CostPerHour;
-        _context.SaveChanges();
+        autoRepository.SaveChanges();
     }
 
     public void SetLocation(AutoSetLocationDto setLocationData)
     {
-        var auto = _context.Autos.FirstOrDefault(auto => auto.Id == setLocationData.Id);
+        var auto = autoRepository.GetById(setLocationData.Id);
         if (auto == null)
         {
             throw new ValidationException("Auto id not found");
@@ -71,13 +70,12 @@ public class AutoService : IAutoService
             throw new ValidationException("Location invalid format. Please re-enter location. (Ex. UA,Zaporizhzhia region,Zaporizhzhia,Schevchenko,1)");
         }
         auto.Location = setLocationData.Location;
-        _context.SaveChanges();
+        autoRepository.SaveChanges();
     }
 
     public IEnumerable<AutoDto> GetRentalAutos()
     {
-        return _context.Autos
-            .Include(auto => auto.Orders)
+        return autoRepository.GetAll()
             .Where(auto => auto.Orders.Any(order => order.Status == AutoRentOrderStatus.Progress))
             .Select(auto => AutoDto.FromEntity(auto))
             .ToList();
@@ -85,13 +83,13 @@ public class AutoService : IAutoService
 
     public IEnumerable<AutoDto> Search(AutoSearchDto searchData)
     {
-        var autos = _context.Autos
+        var autos = autoRepository.GetAll()
             .Where(auto => auto.Location != string.Empty)
             .ToList();
         if (!string.IsNullOrEmpty(searchData.KeyWords))
         {
             autos = autos.Where(auto => searchData.KeyWords.Any(keyWord => auto.Name.Contains(keyWord) || 
-                auto.Name.Contains(keyWord)))
+                auto.Description.Contains(keyWord)))
                 .ToList();
         }
         if (!string.IsNullOrEmpty(searchData.Location))
@@ -110,7 +108,9 @@ public class AutoService : IAutoService
                 .ToList();
         }
         if (searchData.MinCost != 0 &&
-            searchData.MinCost != 0)
+            searchData.MinCost != null &&
+            searchData.MaxCost != 0 &&
+            searchData.MaxCost != null)
         {
             autos = autos.Where(auto => searchData.MinCost <= auto.CostPerHour && auto.CostPerHour < searchData.MaxCost)
                 .ToList();
@@ -121,23 +121,17 @@ public class AutoService : IAutoService
 
     public IEnumerable<string> GetAllAutoClasses()
     {
-        return _context.Autos
-            .Select(auto => auto.Class)
-            .Distinct()
-            .ToList();
+        return autoRepository.GetAllClasses();
     }
 
     public IEnumerable<string> GetAllAutoBrands()
     {
-        return _context.Autos
-            .Select(auto => auto.Brand)
-            .Distinct()
-            .ToList();
+        return autoRepository.GetAllBrands();
     }
 
     public IEnumerable<AutoDto> GetAllAutos()
     {
-        return _context.Autos
+        return autoRepository.GetAll()
             .Select(auto => AutoDto.FromEntity(auto))
             .ToList();
     }

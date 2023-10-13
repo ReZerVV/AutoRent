@@ -1,9 +1,11 @@
 ﻿using AutoRent.Application.Stores;
 using AutoRent.Application.ViewModels;
 using AutoRent.Application.Views;
-using AutoRent.Data;
+using AutoRent.Dal;
+using AutoRent.Dal.Repositories;
 using AutoRent.Services;
 using AutoRent.Services.Interfaces;
+using AutoRent.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Prism.Ioc;
 using Prism.Regions;
@@ -33,6 +35,10 @@ namespace AutoRent.Application
                 new DbContextOptionsBuilder<AppDataContext>()
                     .UseInMemoryDatabase(databaseName: "AutoRent_Db")
                     .Options));
+
+            containerRegistry.Register<IAccountRepository, AccountRepository>();
+            containerRegistry.Register<IAutoRepository, AutoRepository>();
+            containerRegistry.Register<IRentRepository, RentRepository>();
             containerRegistry.Register<IAccountService, AccountService>();
             containerRegistry.Register<IAutoService, AutoService>();
             containerRegistry.Register<IRentService, RentService>();

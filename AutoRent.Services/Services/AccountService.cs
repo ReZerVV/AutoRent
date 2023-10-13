@@ -1,17 +1,17 @@
-using System;
 using AutoRent.Domain;
 using AutoRent.Services.Exceptions;
 using AutoRent.Services.Interfaces;
-using AutoRent.Data;
 using AutoRent.Services.DTOs;
+using AutoRent.Services.Repositories;
+
 namespace AutoRent.Services;
 
 public class AccountService : IAccountService
 {
-    private readonly AppDataContext _context;
-    public AccountService(AppDataContext context)
+    private readonly IAccountRepository accountRepository;
+    public AccountService(IAccountRepository accountRepository)
     {
-        _context = context;
+        this.accountRepository = accountRepository;
     }
 
     public AccountDto Register(AccountRegisterDto registerData)
@@ -21,8 +21,7 @@ public class AccountService : IAccountService
         {
             throw new ValidationException("The username or password is incorrect. Please fix it and try again.");
         }
-        if (_context.Accounts
-            .FirstOrDefault(userCredentials => userCredentials.Username == registerData.Username) != null)
+        if (accountRepository.GetByUsername(registerData.Username) != null)
         {
             throw new InvalidCredentialsException("The user is already registered. Please login.");
         }
@@ -32,8 +31,8 @@ public class AccountService : IAccountService
             Password = registerData.Password,
             Role = registerData.Role,
         };
-        _context.Accounts.Add(userCredentials);
-        _context.SaveChanges();
+        accountRepository.Create(userCredentials);
+        accountRepository.SaveChanges();
         return AccountDto.FromEntity(userCredentials);
     }
 
@@ -44,8 +43,7 @@ public class AccountService : IAccountService
         {
             throw new ValidationException("The username or password is incorrect. Please fix it and try again.");
         }
-        var userCredentials = _context.Accounts
-            .FirstOrDefault(userCredentials => userCredentials.Username == loginData.Username);
+        var userCredentials = accountRepository.GetByUsername(loginData.Username);
         if (userCredentials == null ||
             userCredentials.Password != loginData.Password)
         {

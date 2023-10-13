@@ -8,6 +8,6 @@ public class Auto
     public string Class { get; set; }
     public string Brand { get; set; }
     public decimal CostPerHour { get; set; }
-    public string Location { get; set; }
+    public string? Location { get; set; }
     public List<AutoRentOrder> Orders { get; set; }
 }

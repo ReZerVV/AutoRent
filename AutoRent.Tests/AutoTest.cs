@@ -1,4 +1,5 @@
-﻿using AutoRent.Data;
+﻿using AutoRent.Dal;
+using AutoRent.Dal.Repositories;
 using AutoRent.Domain;
 using AutoRent.Services;
 using AutoRent.Services.DTOs;
@@ -10,6 +11,161 @@ namespace AutoRent.Tests;
 public class AutoTest
 {
     [TestMethod]
+    public void TestRepositoryCreate_1()
+    {
+        var options = new DbContextOptionsBuilder<AppDataContext>()
+           .UseInMemoryDatabase(databaseName: "Db_1")
+           .Options;
+        using (var context = new AppDataContext(options))
+        {
+            var autoRepository = new AutoRepository(context);
+            var auto = new Auto
+            {
+                Name = "TEST",
+                Description = "TEST",
+                Brand = "TEST",
+                Class = "TEST",
+                CostPerHour = 0,
+            };
+            autoRepository.Create(auto);
+            autoRepository.SaveChanges();
+            Assert.IsNotNull(context.Autos.Find(auto.Id));
+        }
+    }
+
+    [TestMethod]
+    public void TestRepositoryRemove_1()
+    {
+        var options = new DbContextOptionsBuilder<AppDataContext>()
+           .UseInMemoryDatabase(databaseName: "Db_2")
+           .Options;
+        using (var context = new AppDataContext(options))
+        {
+            {
+                context.Autos.AddRange(
+                    new Auto
+                    {
+                        Name = "TEST",
+                        Description = "TEST",
+                        Brand = "TEST",
+                        Class = "TEST",
+                        CostPerHour = 0,
+                    }
+                );
+                context.SaveChanges();
+            }
+            var autoRepository = new AutoRepository(context);
+            autoRepository.Remove(context.Autos.Find(1));
+            autoRepository.SaveChanges();
+            Assert.IsNull(context.Accounts.Find(1));
+        }
+    }
+
+    [TestMethod]
+    public void TestRepositoryGetById_1()
+    {
+        var options = new DbContextOptionsBuilder<AppDataContext>()
+           .UseInMemoryDatabase(databaseName: "Db_3")
+           .Options;
+        using (var context = new AppDataContext(options))
+        {
+            {
+                context.Autos.AddRange(
+                    new Auto
+                    {
+                        Name = "TEST",
+                        Description = "TEST",
+                        Brand = "TEST",
+                        Class = "TEST",
+                        CostPerHour = 0,
+                    }
+                );
+                context.SaveChanges();
+            }
+            var autoRepository = new AutoRepository(context);
+            Assert.IsNotNull(autoRepository.GetById(1));
+        }
+    }
+
+    [TestMethod]
+    public void TestRepositoryGetAll_1()
+    {
+        var options = new DbContextOptionsBuilder<AppDataContext>()
+           .UseInMemoryDatabase(databaseName: "Db_4")
+           .Options;
+        using (var context = new AppDataContext(options))
+        {
+            {
+                context.Autos.AddRange(
+                    new Auto
+                    {
+                        Name = "TEST",
+                        Description = "TEST",
+                        Brand = "TEST",
+                        Class = "TEST",
+                        CostPerHour = 0,
+                    }
+                );
+                context.SaveChanges();
+            }
+            var autoRepository = new AutoRepository(context);
+            CollectionAssert.AreEqual(new[] { 1,}, autoRepository.GetAll().Select(auto => auto.Id).ToList());
+        }
+    }
+
+    [TestMethod]
+    public void TestRepositoryGetBrands_1()
+    {
+        var options = new DbContextOptionsBuilder<AppDataContext>()
+           .UseInMemoryDatabase(databaseName: "Db_5")
+           .Options;
+        using (var context = new AppDataContext(options))
+        {
+            {
+                context.Autos.AddRange(
+                    new Auto
+                    {
+                        Name = "TEST",
+                        Description = "TEST",
+                        Brand = "TEST",
+                        Class = "TEST",
+                        CostPerHour = 0,
+                    }
+                );
+                context.SaveChanges();
+            }
+            var autoRepository = new AutoRepository(context);
+            CollectionAssert.AreEqual(new[] { "TEST", }, autoRepository.GetAllBrands().ToList());
+        }
+    }
+
+    [TestMethod]
+    public void TestRepositoryGetClasses_1()
+    {
+        var options = new DbContextOptionsBuilder<AppDataContext>()
+           .UseInMemoryDatabase(databaseName: "Db_6")
+           .Options;
+        using (var context = new AppDataContext(options))
+        {
+            {
+                context.Autos.AddRange(
+                    new Auto
+                    {
+                        Name = "TEST",
+                        Description = "TEST",
+                        Brand = "TEST",
+                        Class = "TEST",
+                        CostPerHour = 0,
+                    }
+                );
+                context.SaveChanges();
+            }
+            var autoRepository = new AutoRepository(context);
+            CollectionAssert.AreEqual(new[] { "TEST", }, autoRepository.GetAllClasses().ToList());
+        }
+    }
+
+    [TestMethod]
     public void TestCreateAuto_1()
     {
         var options = new DbContextOptionsBuilder<AppDataContext>()
@@ -17,7 +173,8 @@ public class AutoTest
             .Options;
         using (var context = new AppDataContext(options))
         {
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             autoService.Create(new AutoCreateDto
             {
                 Name = "TEST",
@@ -45,12 +202,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = string.Empty,
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 0,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             autoService.Delete(1);
             Assert.IsNull(context.Autos.Find(1));
         }
@@ -72,12 +230,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = string.Empty,
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 0,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             autoService.Update(new AutoUpdateDto
             {
                 Id = 1,
@@ -112,20 +271,21 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = string.Empty,
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 0,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             autoService.SetLocation(new AutoSetLocationDto
             {
                 Id = 1,
-                Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
             });
             var auto = context.Autos.Find(1);
             Assert.IsNotNull(auto);
-            Assert.AreEqual("Ukraine,Zaporizhzhia region,Zaporizhzhia", auto.Location);
+            Assert.AreEqual("UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1", auto.Location);
         }
     }
 
@@ -145,12 +305,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = string.Empty,
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 0,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var autos = autoService.GetRentalAutos();
             CollectionAssert.AreEqual(new AutoDto[0], autos.ToArray());
         }
@@ -172,12 +333,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = string.Empty,
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 0,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var autos = autoService.Search(new AutoSearchDto
             {
                 KeyWords = "TEST",
@@ -202,15 +364,16 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 0,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var autos = autoService.Search(new AutoSearchDto
             {
-                Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
             });
             CollectionAssert.AreEqual(new[] { 1 }, autos.Select(auto => auto.Id).ToArray());
         }
@@ -232,12 +395,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 10,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var autos = autoService.Search(new AutoSearchDto
             {
                  Class = "TEST",
@@ -262,12 +426,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 10,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var autos = autoService.Search(new AutoSearchDto
             {
                 Brand = "TEST",
@@ -292,12 +457,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 10,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var autos = autoService.Search(new AutoSearchDto
             {
                 MinCost = 0,
@@ -323,12 +489,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 10,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var classes = autoService.GetAllAutoClasses();
             CollectionAssert.AreEqual(new[] { "TEST" }, classes.ToArray());
         }
@@ -350,12 +517,13 @@ public class AutoTest
                     Description = "TEST",
                     Class = "TEST",
                     Brand = "TEST",
-                    Location = "Ukraine,Zaporizhzhia region,Zaporizhzhia",
+                    Location = "UA,Zaporizhzhia region,Zaporizhzhia,Schvchenko,1",
                     CostPerHour = 10,
                 }
             );
             context.SaveChanges();
-            var autoService = new AutoService(context);
+            var autoRepository = new AutoRepository(context);
+            var autoService = new AutoService(autoRepository);
             var classes = autoService.GetAllAutoBrands();
             CollectionAssert.AreEqual(new[] { "TEST" }, classes.ToArray());
         }

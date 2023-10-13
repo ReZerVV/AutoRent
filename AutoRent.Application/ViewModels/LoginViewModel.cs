@@ -5,6 +5,7 @@ using AutoRent.Services.Exceptions;
 using AutoRent.Services.Interfaces;
 using System;
 using AutoRent.Application.Stores;
+using DryIoc;
 
 namespace AutoRent.Application.ViewModels
 {
@@ -78,9 +79,9 @@ namespace AutoRent.Application.ViewModels
                     Username = Username,
                     Password = Password,
                 });
-                regionManager.RequestNavigate("ContentRegion", "HomeView");
                 Username = string.Empty;
                 Password = string.Empty;
+                regionManager.RequestNavigate("ContentRegion", "HomeView");
             }
             catch (ValidationException e)
             { 
@@ -100,7 +101,11 @@ namespace AutoRent.Application.ViewModels
         private void Navigate(string navigatePath)
         {
             if (navigatePath != null)
-                regionManager.RequestNavigate("ContentRegion", navigatePath);
+            { 
+                var parameters = new NavigationParameters();
+                parameters.Add("KeepAlive", false);
+                regionManager.RequestNavigate("ContentRegion", navigatePath, parameters);
+            }
         }
     }
 }

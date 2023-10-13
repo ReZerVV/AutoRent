@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoRent.Tests", "AutoRent.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoRent.Application", "AutoRent.Application\AutoRent.Application.csproj", "{822FE56A-9DBF-4C23-90F9-069ED470A37B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoRent.ConsoleApplication", "AutoRent.ConsoleApplication\AutoRent.ConsoleApplication.csproj", "{61D9892E-B3E1-425A-B389-48615CC01B68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoRent.ConsoleApplication", "AutoRent.ConsoleApplication\AutoRent.ConsoleApplication.csproj", "{61D9892E-B3E1-425A-B389-48615CC01B68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoRent.Dal", "AutoRent.Dal\AutoRent.Dal.csproj", "{C972226E-ECD8-44FB-9742-752CEDAF3CF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{61D9892E-B3E1-425A-B389-48615CC01B68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61D9892E-B3E1-425A-B389-48615CC01B68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61D9892E-B3E1-425A-B389-48615CC01B68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C972226E-ECD8-44FB-9742-752CEDAF3CF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C972226E-ECD8-44FB-9742-752CEDAF3CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C972226E-ECD8-44FB-9742-752CEDAF3CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C972226E-ECD8-44FB-9742-752CEDAF3CF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

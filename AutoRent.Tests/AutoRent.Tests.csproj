@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AutoRent.Dal\AutoRent.Dal.csproj" />
     <ProjectReference Include="..\AutoRent.Services\AutoRent.Services.csproj" />
   </ItemGroup>
 

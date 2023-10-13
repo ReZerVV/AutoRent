@@ -1,28 +1,34 @@
-using AutoRent.Data;
 using AutoRent.Domain;
 using AutoRent.Services.DTOs;
 using AutoRent.Services.Exceptions;
 using AutoRent.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using AutoRent.Services.Repositories;
 
 namespace  AutoRent.Services;
 
 public class RentService : IRentService
 {
-    private readonly AppDataContext _context;
+    private readonly IRentRepository rentRepository;
+    private readonly IAccountRepository accountRepository;
+    private readonly IAutoRepository autoRepository;
 
-    public RentService(AppDataContext context)
+    public RentService(
+        IRentRepository rentRepository,
+        IAccountRepository accountRepository,
+        IAutoRepository autoRepository)
     {
-        _context = context;
+        this.rentRepository = rentRepository;
+        this.accountRepository = accountRepository;
+        this.autoRepository = autoRepository;
     }
 
     public void Booking(AutoRentOrderBookingDto rentData)
     {
-        if (!_context.Accounts.Any(account => account.Id == rentData.RenterId))
+        if (accountRepository.GetById(rentData.RenterId) == null)
         {
             throw new ValidationException("Renter id not found");
         }
-        if (!_context.Autos.Any(auto => auto.Id == rentData.AutoId))
+        if (autoRepository.GetById(rentData.AutoId) == null)
         {
             throw new ValidationException("Auto id not found");
         }
@@ -33,13 +39,13 @@ public class RentService : IRentService
         }
         var autoRentOrder = rentData.ToEntity();
         autoRentOrder.Status = AutoRentOrderStatus.Waiting;
-        _context.Orders.Add(autoRentOrder);
-        _context.SaveChanges();
+        rentRepository.Create(autoRentOrder);
+        rentRepository.SaveChanges();
     }
 
     public void Rent(int id)
     {
-        var autoRentOrder = _context.Orders.Find(id);
+        var autoRentOrder = rentRepository.GetById(id);
         if (autoRentOrder == null)
         {
             throw new ValidationException("Rent id not found");
@@ -49,15 +55,12 @@ public class RentService : IRentService
             throw new ValidationException("The order completed");
         }
         autoRentOrder.Status = AutoRentOrderStatus.Progress;
-        _context.SaveChanges();
+        rentRepository.SaveChanges();
     }
 
     public decimal Return(int id)
     {
-        var autoRentOrder = _context.Orders
-            .Include(order => order.Auto)
-            .Where(order => order.Id == id)
-            .SingleOrDefault();
+        var autoRentOrder = rentRepository.GetById(id);
         if (autoRentOrder == null)
         {
             throw new ValidationException("Rent id not found");
@@ -69,52 +72,37 @@ public class RentService : IRentService
         autoRentOrder.Status = AutoRentOrderStatus.Сompleted;
         autoRentOrder.Cost = (autoRentOrder.RentalEndDate - autoRentOrder.RentalStartDate).Hours *
                              autoRentOrder.Auto.CostPerHour;
-        _context.SaveChanges();
+        rentRepository.SaveChanges();
         return autoRentOrder.Cost;
     }
 
     public IEnumerable<AutoRentOrderDto> GetOrdersByAutoId(int id)
     {
-        if (!_context.Accounts.Any(account => account.Id == id))
+        if (autoRepository.GetById(id) == null)
         {
-            throw new ValidationException("Renter id not found");
+            throw new ValidationException("Auto id not found");
         }
-        return _context.Autos
-            .Include(auto => auto.Orders)
-            .Where(auto => auto.Id == id)
-            .SelectMany(auto => auto.Orders)
-            .Where(order => order.RentalStartDate >= DateTime.Now)
-            .Where(order => order.Status == AutoRentOrderStatus.Waiting)
-            .Include(order => order.Renter)
-            .Include(order => order.Auto)
+        return rentRepository.GetOrdersByAutoId(id)
             .Select(order => AutoRentOrderDto.FromEntity(order))
             .ToList();
     }
 
     public IEnumerable<AutoRentOrderDto> GetHistoryByRenterId(int id)
     {
-        if (!_context.Accounts.Any(auto => auto.Id == id))
+        if (accountRepository.GetById(id) == null)
         {
-            throw new ValidationException("Auto id not found");
+            throw new ValidationException("Renter id not found");
         }
-        return _context.Accounts
-            .Include(account => account.Orders)
-            .Where(account => account.Id == id)
-            .SelectMany(account => account.Orders)
-            .Where(order => order.Status == AutoRentOrderStatus.Сompleted)
-            .Include(order => order.Renter)
-            .Include(order => order.Auto)
+        return rentRepository.GetHistoryByRenterId(id)
             .Select(order => AutoRentOrderDto.FromEntity(order))
             .ToList();
     }
 
     public AutoRentOrderDto? GetById(int id)
     {
-        return _context.Orders
-            .Include(order => order.Renter)
-            .Include(order => order.Auto)
-            .Where(order => order.Id == id)
-            .Select(order => AutoRentOrderDto.FromEntity(order))
-            .SingleOrDefault();
+        var entity = rentRepository.GetById(id);
+        if (entity == null)
+            return null;
+        return AutoRentOrderDto.FromEntity(entity);
     }
 }

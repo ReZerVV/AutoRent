@@ -32,7 +32,9 @@ namespace AutoRent.Application.ViewModels
         private void Logout()
         {
             AccountStore.Logout();
-            regionManager.RequestNavigate("ContentRegion", "LoginView");
+            var parameters = new NavigationParameters();
+            parameters.Add("KeepAlive", false);
+            regionManager.RequestNavigate("ContentRegion", "LoginView", parameters);
         }
 
         public DelegateCommand<string> NavigateMenuCommand { get; private set; }
