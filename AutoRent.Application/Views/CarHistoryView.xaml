@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="AutoRent.Application.Views.CarHistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AutoRent.Application.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <WrapPanel Orientation="Horizontal">
+            <Button Command="{Binding ReloadOrdersCommand}"
+                    Margin="10 0 0 0">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Refresh"
+                                             VerticalAlignment="Center"
+                                             Foreground="#ffffff"/>
+                    <TextBlock Foreground="#ffffff"
+                               Margin="5 0 0 0">
+                        Reload
+                    </TextBlock>
+                </StackPanel>
+            </Button>
+        </WrapPanel>
+        <ScrollViewer Grid.Row="1"
+                      Margin="0 10 0 0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Hidden">
+            <ItemsControl ItemsSource="{Binding Orders}"
+                          x:Name="_listOfOrders">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1"
+                                BorderBrush="#e0e3e4"
+                                Padding="20"
+                                Width="600"
+                                Margin="0 10 0 0">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Border BorderThickness="0 0 0 1"
+                                        BorderBrush="#e0e3e4"
+                                        Margin="0 0 0 10"
+                                        Padding="0 0 0 10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding RentalStartDate}"
+                                                   VerticalAlignment="Center">
+                                        </TextBlock>
+                                        <Border BorderThickness="0 0 0 1"
+                                                VerticalAlignment="Center"
+                                                BorderBrush="#e0e3e4"
+                                                Grid.Column="1"
+                                                Margin="10 0">
+                                        </Border>
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding RentalEndDate}"
+                                                   VerticalAlignment="Center">
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Row="1">
+                                    <Grid>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   FontSize="18"
+                                                   FontWeight="Regular">
+                                                Car name:
+                                        </TextBlock>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   Text="{Binding Auto.Name}"
+                                                   FontSize="18"
+                                                   FontWeight="Light">
+
+                                        </TextBlock>
+                                    </Grid>
+                                    <Grid Margin="0 5 0 0">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   FontSize="18"
+                                                   FontWeight="Regular">
+                                                Cost:
+                                        </TextBlock>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   Text="{Binding Cost}"
+                                                   FontSize="18"
+                                                   FontWeight="Light">
+
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <TextBlock Grid.Row="1"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   FontSize="20">
+            <TextBlock.Resources>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Orders.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Resources>
+            There is no orders.
+        </TextBlock>
+    </Grid>
+</UserControl>

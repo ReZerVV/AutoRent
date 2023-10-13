@@ -1,0 +1,258 @@
+﻿<UserControl x:Class="AutoRent.Application.Views.SearchCarsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AutoRent.Application.Views"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="1024" d:DesignWidth="1440">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="1"
+                      Margin="0 10 0 0"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Hidden">
+            <ScrollViewer.Resources>
+                <Style TargetType="{x:Type ScrollViewer}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Cars.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ScrollViewer.Resources>
+            <ItemsControl ItemsSource="{Binding Cars}"
+                          x:Name="_listOfCars">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="1"
+                                BorderBrush="#e0e3e4"
+                                Padding="20"
+                                Margin="0 10 0 0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="1">
+                                    <StackPanel>
+                                        <Grid>
+                                            <TextBlock>
+                                                <Hyperlink TextDecorations="Underline"
+                                                           Foreground="Black"
+                                                           Command="{Binding ElementName=_listOfCars, Path=DataContext.DetailsCarNavigateMenuCommand}"
+                                                           CommandParameter="{Binding}">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               VerticalAlignment="Center"
+                                                               FontSize="28"
+                                                               Foreground="Black"
+                                                               FontWeight="Bold">
+                                                    </TextBlock>
+                                                </Hyperlink>
+                                            </TextBlock>
+                                            <StackPanel Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right">
+                                                <TextBlock Text="{Binding CostPerHour}"
+                                                           FontSize="20"
+                                                           FontWeight="Regular">
+                                                </TextBlock>
+                                                <TextBlock FontSize="20"
+                                                           FontWeight="Regular">
+                                                    $
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="18"
+                                                       FontWeight="Regular">
+                                                Brand:
+                                            </TextBlock>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Right"
+                                                       Text="{Binding Brand}"
+                                                       FontSize="18"
+                                                       FontWeight="Light">
+
+                                            </TextBlock>
+                                        </Grid>
+                                        <Grid>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="18"
+                                                       FontWeight="Regular">
+                                                Class:
+                                            </TextBlock>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Right"
+                                                       Text="{Binding Class}"
+                                                       FontSize="18"
+                                                       FontWeight="Light">
+                                            </TextBlock>
+                                        </Grid>
+                                        <Grid>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="18"
+                                                       FontWeight="Regular">
+                                                Location:
+                                            </TextBlock>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       HorizontalAlignment="Right"
+                                                       Text="{Binding Location}"
+                                                       FontSize="18"
+                                                       FontWeight="Light">
+                                            </TextBlock>
+                                        </Grid>
+                                        <Border BorderThickness="0 1 0 0"
+                                                BorderBrush="#e0e3e4"
+                                                Margin="0 10">
+                                        </Border>
+                                        <TextBlock TextWrapping="Wrap"
+                                                   Text="{Binding Description}"
+                                                   FontSize="16"
+                                                   FontWeight="Light">
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Border Padding="10 20"
+                Width="650"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="#db5c4c"
+                CornerRadius="0 0 0 20">
+            <Border.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Cars.Count}" Value="0">
+                            <Setter Property="Grid.Row" Value="1" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Resources>
+            <StackPanel>
+                <Border CornerRadius="5"
+                        Background="#ffffff">
+                    <TextBox materialDesign:HintAssist.Hint="Search"
+                             BorderThickness="0"
+                             BorderBrush="#db5c4c"
+                             VerticalAlignment="Center"
+                             Padding="10"
+                             Text="{Binding Search}">
+                    </TextBox>
+                </Border>
+                <Border CornerRadius="5"
+                        Background="#ffffff"
+                        Margin="0 10 0 0">
+                    <TextBox materialDesign:HintAssist.Hint="Location"
+                             BorderThickness="0"
+                             BorderBrush="#db5c4c"
+                             VerticalAlignment="Center"
+                             Padding="10"
+                             Text="{Binding Location}">
+                    </TextBox>
+                </Border>
+                <Grid Margin="0 10 0 0">
+                    <Border CornerRadius="5"
+                            Width="305"
+                            HorizontalAlignment="Left"
+                            Background="#ffffff">
+                        <ComboBox BorderBrush="#db5c4c"
+                                  BorderThickness="0"
+                                  materialDesign:HintAssist.Hint="Brand"
+                                  Padding="10"
+                                  ItemsSource="{Binding BrandsValues}"
+                                  SelectedItem="{Binding Brand}">
+                        </ComboBox>
+                    </Border>
+                    <Border CornerRadius="5"
+                            Width="305"
+                            HorizontalAlignment="Right"
+                            Background="#ffffff">
+                        <ComboBox BorderBrush="#db5c4c"
+                                  BorderThickness="0"
+                                  materialDesign:HintAssist.Hint="Class"
+                                  Padding="10"
+                                  ItemsSource="{Binding ClassesValues}"
+                                  SelectedItem="{Binding Class}">
+                        </ComboBox>
+                    </Border>
+                </Grid>
+                <Grid Margin="0 10 0 0">
+                    <Border CornerRadius="5"
+                            Width="305"
+                            HorizontalAlignment="Left"
+                            Background="#ffffff">
+                        <TextBox materialDesign:HintAssist.Hint="Price from"
+                                 BorderThickness="0"
+                                 BorderBrush="#db5c4c"
+                                 VerticalAlignment="Center"
+                                 Padding="10"
+                                 Text="{Binding PriceFrom}">
+                        </TextBox>
+                    </Border>
+                    <Border CornerRadius="5"
+                            Width="305"
+                            HorizontalAlignment="Right"
+                            Background="#ffffff">
+                        <TextBox materialDesign:HintAssist.Hint="Price to"
+                                 BorderThickness="0"
+                                 BorderBrush="#db5c4c"
+                                 VerticalAlignment="Center"
+                                 Padding="10"
+                                 Text="{Binding PriceTo}">
+                        </TextBox>
+                    </Border>
+                </Grid>
+                <Grid Margin="0 10 0 0">
+                    <Button Width="305"
+                            HorizontalAlignment="Left"
+                            Command="{Binding ClearFilterCommand}"
+                            materialDesign:ShadowAssist.Darken="False"
+                            Background="Transparent"
+                            BorderBrush="#ffffff">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Clear"
+                                                     VerticalAlignment="Center"
+                                                     Foreground="#ffffff"/>
+                            <TextBlock Margin="5 0 0 0"
+                                       Foreground="#ffffff">
+                                Clear
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Width="305"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SearchCarsCommand}"
+                            materialDesign:ShadowAssist.Darken="False">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Search"
+                                                     VerticalAlignment="Center"
+                                                     Foreground="#ffffff"/>
+                            <TextBlock Margin="5 0 0 0"
+                                       Foreground="#ffffff">
+                                Search
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
